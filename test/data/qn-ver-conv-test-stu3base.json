@@ -1,0 +1,113 @@
+{
+    "id": "qn-ver-conv-test-stu3base",
+    "meta": {
+        "profile": [
+            "http://hl7.org/fhir/stu3/StructureDefinition/Questionnaire"
+        ],
+        "tag": [
+            {
+                "code": "born-stu3"
+            }
+        ]
+    },
+    "url": "http:/lforms-fhir.nlm.nih.gov/baseDstu3/Questionnaire/qn-ver-conv-test-stu3base",
+    "status": "draft",
+    "title": "Demo form",
+    "resourceType": "Questionnaire",
+    "item": [
+        {
+            "type": "string",
+            "linkId": "/X-001",
+            "text": "Favorite dessert (try ice cream)"
+        },
+        {
+            "type": "string",
+            "code": [
+                {
+                    "code": "X-002",
+                    "display": "Ice cream flavor?"
+                }
+            ],
+            "required": false,
+            "linkId": "/X-002",
+            "text": "Ice cream flavor?",
+            "enableWhen": [
+                {
+                    "answerString": "ice cream",
+                    "question": "/X-001"
+                }
+            ],
+            "initialString": "Mint"
+        },
+        {
+            "type": "choice",
+            "linkId": "/X-003",
+            "text": "Favorite color",
+            "option": [
+                {
+                    "valueCoding": {
+                        "code": "c",
+                        "display": "Green"
+                    }
+                },
+                {
+                    "valueCoding": {
+                        "code": "o",
+                        "display": "Other"
+                    }
+                }
+            ]
+        },
+        {
+            "type": "string",
+            "linkId": "/X-004",
+            "text": "Which shade of green?",
+            "enableWhen": [
+                {
+                    "answerCoding": {
+                        "code": "c"
+                    },
+                    "question": "/X-003"
+                }
+            ]
+        },
+        {
+            "type": "open-choice",
+            "linkId": "/X-010",
+            "text": "Favorite type of food",
+            "option": [
+                {
+                    "valueCoding": {
+                        "code": "mex",
+                        "display": "Mexican"
+                    }
+                },
+                {
+                    "valueCoding": {
+                        "code": "itl",
+                        "display": "Italian"
+                    }
+                }
+            ]
+        },
+        {
+            "type": "string",
+            "linkId": "/X-011",
+            "text": "Tell us why you chose food type",
+            "enableWhen": [
+                {
+                    "question": "/X-010",
+                    "hasAnswer": true
+                }
+            ]
+        },
+        {
+            "type": "choice",
+            "linkId": "/X-012",
+            "text": "Favorite beach",
+            "options": {
+                "reference": "http://ocean-beach.com/ValueSet/beach"
+            }
+        }
+    ]
+}

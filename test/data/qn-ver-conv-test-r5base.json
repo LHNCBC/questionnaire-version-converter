@@ -1,0 +1,136 @@
+{
+    "id": "qn-ver-conv-test-r5base",
+    "meta": {
+        "profile": [
+            "http://hl7.org/fhir/5.0/StructureDefinition/Questionnaire"
+        ],
+        "tag": [
+            {
+                "code": "born-r5"
+            }
+        ]
+    },
+    "url": "http:/lforms-fhir.nlm.nih.gov/baseR5/Questionnaire/qn-ver-conv-test-r5base",
+    "status": "draft",
+    "title": "Demo form",
+    "resourceType": "Questionnaire",
+    "derivedFrom": "http://standard-qn-repo.org/qn-100",
+    "item": [
+        {
+            "type": "string",
+            "linkId": "/X-001",
+            "text": "Favorite dessert (try ice cream)"
+        },
+        {
+            "type": "string",
+            "code": [
+                {
+                    "code": "X-002",
+                    "display": "Ice cream flavor?"
+                }
+            ],
+            "required": false,
+            "linkId": "/X-002",
+            "text": "Ice cream flavor?",
+            "enableWhen": [
+                {
+                    "answerString": "ice cream",
+                    "question": "/X-001",
+                    "operator": "="
+                }
+            ],
+            "initial": [
+                {
+                    "valueString": "Mint"
+                }
+            ]
+        },
+        {
+            "type": "coding",
+            "linkId": "/X-003",
+            "text": "Favorite color",
+            "answerOption": [
+                {
+                    "valueCoding": {
+                        "code": "c",
+                        "display": "Green"
+                    },
+                    "initialSelected": true
+                },
+                {
+                    "valueCoding": {
+                        "code": "o",
+                        "display": "Other"
+                    }
+                }
+            ],
+            "answerConstraint": "optionsOrString"
+        },
+        {
+            "type": "string",
+            "linkId": "/X-004",
+            "text": "Which shade of green?",
+            "enableWhen": [
+                {
+                    "answerCoding": {
+                        "code": "c"
+                    },
+                    "question": "/X-003",
+                    "operator": "="
+                }
+            ]
+        },
+        {
+            "type": "decimal",
+            "linkId": "/X-005",
+            "text": "Favorite number (try > 10)"
+        },
+        {
+            "type": "decimal",
+            "linkId": "/X-006",
+            "text": "Favorite <= 10?  (shown if previous is > 10)",
+            "enableWhen": [
+                {
+                    "answerDecimal": 10,
+                    "question": "/X-005",
+                    "operator": ">"
+                }
+            ]
+        },
+        {
+            "type": "integer",
+            "linkId": "/X-010",
+            "text": "Select your favorite number or enter your own if not in the list",
+            "answerOption": [
+                {
+                    "valueInteger": 1
+                },
+                {
+                    "valueInteger": 2
+                },
+                {
+                    "valueInteger": 3
+                }
+            ],
+            "answerConstraint": "optionsOrType"
+        },
+        {
+            "type": "string",
+            "linkId": "/X-011",
+            "text": "Tell us why you like that number.",
+            "enableWhen": [
+                {
+                    "answerBoolean": true,
+                    "question": "/X-010",
+                    "operator": "exists"
+                }
+            ]
+        },
+        {
+            "type": "coding",
+            "linkId": "/X-012",
+            "text": "Favorite beach",
+            "answerValueSet": "http://ocean-beach.com/ValueSet/beach"
+        }
+    ]
+}
