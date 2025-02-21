@@ -2,7 +2,7 @@ const assert = require('assert');
 const fs = require('fs');
 const path = require("path");
 const { getConverter } = require('../../src/qnvconv');
-const { newPathFrom } = require("../../src/qnvconv_common");
+const { newPathFrom } = require("../../src/cli_util");
 
 // A map of the supported FHIR versions (mapped to itself)
 const FHIR_V = ['STU3', 'R4', 'R5'].reduce((acc, v) => {acc[v] = v; return acc;}, {});
@@ -13,6 +13,8 @@ const testFiles = {
   R5: path.resolve(__dirname, '../data/qn-ver-conv-test-r5base.json'),
   output: path.resolve(__dirname, '../data/output')
 }
+
+fs.mkdirSync(testFiles.output, {recursive: true});
 
 /**
  * Test questionnaire conversion from the vFrom to vto.

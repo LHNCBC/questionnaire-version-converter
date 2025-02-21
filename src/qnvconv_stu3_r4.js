@@ -1,6 +1,6 @@
 
 
-// Functions for FHIR Auestionnaire conversion between STU3 and R4
+// Functions for FHIR Questionnaire conversion between STU3 and R4
 
 const {createMsg, updateRetStatus} = require('./qnvconv_common');
 
@@ -84,7 +84,7 @@ function enableWhenR3ToR4(item) {
       ew.operator = '=';
       let answerX = Object.keys(ew).find(f => f.startsWith('answer'));
       if(answerX === 'answerUri' || answerX === 'answerAttachment') { // not in R4
-        updateRetStatus(ret, -1, createMsg(item, -1, 'answerUri or answerAttachment dropped from enableWhen '));
+        updateRetStatus(ret, -1, createMsg(item, -1, answerX + ' dropped from enableWhen'));
         ew = null; // entry to be filtered out next.
       }
     }
@@ -101,7 +101,7 @@ function enableWhenR3ToR4(item) {
 
 /**
  * Convert the given item's option and options to the R4 counterpart.
- * @param item the item whose enableWhen is to be converted.
+ * @param item the item whose option and options are to be converted.
  * @return {{data, status: number}}
  */
 function answerOptionsR3ToR4(item) {
@@ -183,7 +183,7 @@ function qnItemR4ToR3(item) {
       item[initialKey] = item.initial[0][valueKey];
     }
     else {
-      updateRetStatus(ret, -1, createMsg(item, -1, 'Failed to convert item.initial[0'));
+      updateRetStatus(ret, -1, createMsg(item, -1, 'Failed to convert item.initial[0]'));
     }
     if(item.initial.length > 1) {
       updateRetStatus(ret, -1, createMsg(item, -1, 'All but the first item.initial have been dropped.'));

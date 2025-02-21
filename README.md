@@ -2,7 +2,7 @@
 
 This questionnaire converter converts FHIR&copy; Questionnaire resources between different FHIR versions. 
 It includes a library and a command line tool. The FHIR versions currently supported include STU3, R4, and R5, 
-and the support for R6 is being considered (without a planned or promised date).
+and the support for R6 is being considered.
 
 A few general notes:
 - The converter assumes that the input questionnaires are valid, and if not, the results may be corrupted.

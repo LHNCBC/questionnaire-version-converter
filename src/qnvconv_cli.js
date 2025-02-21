@@ -10,14 +10,14 @@ const path = require('path');
 const {program: commander} = require("commander");
 
 const { getConverter } = require('./qnvconv');
-const {newPathFrom, updateRetStatus, createMsg} = require('./qnvconv_common');
-
+const {updateRetStatus, createMsg} = require('./qnvconv_common');
+const { newPathFrom } = require('./cli_util');
 
 commander.showHelpAfterError(); // instruct commander to show full help message on invalid command line arguments.
 commander
   .option('-v, --verbosity <number>', 'message display level: 0 - very brief; 1 - brief; 2 - detailed.',
     (x)=>parseInt(x), 1) // there seems to be a bug, using parseInt alone doesn't work when option value equals default.
-  .option('-p, --pretty', 'whether enable pretty print when writing resultsto file', false)
+  .option('-p, --pretty', 'whether to enable pretty print when writing results to file', false)
   .argument('<version-from>', 'the FHIR version for the input questionnaries')
   .argument('<version-to>', 'the target version for the converted questionnaires')
   .argument('<input-path>', 'the path for the input file or directory - only .json files will be processed.')
@@ -41,7 +41,7 @@ commander
  *        my-qn.json and the target/output version is R5, the output file name will be: my-qn-R5.json
  * @param vFrom the FHIR version of the input questionnaires
  * @param vTo the FHIR version of the output questionnaires
- * @param opts conversion options, currently only has one option, verbosity
+ * @param opts conversion options. Currently, there are two options, verbosity and pretty.
  */
 function processPath(inPath, outDir, vFrom, vTo, opts) {
   let stats = fs.statSync(inPath);
@@ -71,6 +71,7 @@ function processPath(inPath, outDir, vFrom, vTo, opts) {
  * @param vFrom the FHIR version of the input questionnaires
  * @param vTo the FHIR version of the output questionnaires
  * @param opts conversion options, currently only has one option, verbosity
+ * @return true if successful, false if error(s) occurred
  */
 function processResFile(inPath, outPath, vFrom, vTo, opts) {
   console.log('==== converting', inPath);
@@ -90,7 +91,9 @@ function processResFile(inPath, outPath, vFrom, vTo, opts) {
   }
   else {
     console.error('%s: result.data not set, conversion might have failed.', inPath);
+    return false;
   }
+  return true;
 }
 
 
