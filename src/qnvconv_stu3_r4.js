@@ -2,7 +2,7 @@
 
 // Functions for FHIR Questionnaire conversion between STU3 and R4
 
-import {createMsg, updateRetStatus} from './qnvconv_common.js';
+import {createMsg, updateRetStatus, findChoiceX} from './qnvconv_common.js';
 
 export {
   qnR3ToR4,
@@ -49,9 +49,9 @@ function qnItemR3ToR4(item) {
   let optRet = answerOptionsR3ToR4(item);
   updateRetStatus(ret, optRet.status, optRet.message);
 
-  let initialX = Object.keys(item).find(f => f.startsWith('initial'));
+  let {srcX: initialX, toX: valueX} = findChoiceX(item, 'initial', 'value');
   if(initialX) {
-    item.initial = [{ ['value' + initialX.substring(7)]: item[initialX] }];
+    item.initial = [{ [valueX]: item[initialX] }];
     delete item[initialX];
   }
 
@@ -82,7 +82,7 @@ function enableWhenR3ToR4(item) {
     }
     else { // answer[X]
       ew.operator = '=';
-      let answerX = Object.keys(ew).find(f => f.startsWith('answer'));
+      let {srcX: answerX} = findChoiceX(ew, 'answer');
       if(answerX === 'answerUri' || answerX === 'answerAttachment') { // not in R4
         updateRetStatus(ret, -1, createMsg(item, -1, answerX + ' dropped from enableWhen'));
         ew = null; // entry to be filtered out next.
@@ -247,15 +247,23 @@ function answerOptionsR4ToR3(item) {
   }
 
   if(item.answerOption) {
+    let initialXSet = false;
     item.option = item.answerOption.map(opt => {
-      if(opt.hasOwnProperty('initialSelected')) {
-        delete opt.initialSelected;
-        updateRetStatus(ret, -1, createMsg(item, -1, 'deleted answerOption.initialSelected'));
-      }
       if(opt.valueReference) {
         delete opt.valueReference;
         updateRetStatus(ret, -1, createMsg(item, -1, 'deleted answerOption.valueReference'));
         return null; // filter out the valueReference next.
+      }
+
+      if(opt.hasOwnProperty('initialSelected')) {
+        delete opt.initialSelected;
+        let {srcX: valueX, toX: initialX} = findChoiceX(opt, 'value', 'initial');
+        if(initialXSet) {
+          updateRetStatus(ret, -1, createMsg(item, -1, 'ignored answerOption.initialSelected for ' + opt[valueX]));
+        }
+        else {
+          item[initialX] = opt[valueX];
+        }
       }
       return opt;
     }).filter(opt => opt);

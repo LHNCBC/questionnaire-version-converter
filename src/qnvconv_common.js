@@ -3,7 +3,35 @@
 
 export {
   createMsg,
-  updateRetStatus
+  updateRetStatus,
+  findChoiceX
+}
+
+
+/**
+ * Find the choice type [X] key in the given object for the given prefix and optionally create a new
+ * key name for the given toPrefix.
+ * For example, if the given srcPrefix is "value", this function will try to find the value[X] key (field
+ * name) in the given object. If value[X] exists and toPrefix is provided (e.g., "initial"), it will also
+ * create the corresponding key name initial[X].
+ * @param srcObj the source object
+ * @param srcPrefix the source choice [X] prefix, e.g., "value", "initial"
+ * @param toPrefix the "to" choice [X] prefix, e.g., "value", "initial". If and only if
+ *        toPrefix is given (and the source key exists), a toKey will be created and returned.
+ * @return an object (may be empty but not null/undefined) with two possible fields:
+ *         - srcX: the srcPrefix[X] key if exists
+ *         - toX: the toPrefix[X] key if toPrefix is given and srcX exists
+ */
+function findChoiceX(srcObj, srcPrefix, toPrefix) {
+  let ret = {};
+  let srcX = Object.keys(srcObj || {}).find(f => f.startsWith(srcPrefix));
+  if(srcX) {
+    ret.srcX = srcX;
+    if(toPrefix) {
+      ret.toX = toPrefix + srcX.substring(srcPrefix.length);
+    }
+  }
+  return ret;
 }
 
 

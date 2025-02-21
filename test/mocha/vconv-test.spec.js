@@ -87,6 +87,7 @@ describe('FHIR Questionnaire version conversion', function() {
       assert(x003);
       assert.equal(x003.option[0].valueCoding.code, 'c');
       assert.equal(Object.hasOwnProperty(x003.option[0].initialSelected), false);
+      assert.equal(x003.initialCoding.code, "c");
 
       let x006 = qnTo.item.find(t => t.linkId === '/X-006');
       assert(x006);
