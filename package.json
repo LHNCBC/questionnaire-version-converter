@@ -1,5 +1,5 @@
 {
-  "name": "questionnaire-version-converter-lhc",
+  "name": "questionnaire-version-converter",
   "version": "1.0.0",
   "description": "For converting FHIR questionnaires between FHIR versions.",
   "main": "src/qnvconv.js",

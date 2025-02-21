@@ -19,12 +19,12 @@ As with any npm packages, it needs to be installed before use:
 #### Using the Questionnaire Conversion Library
 To make a conversion within javascript apps/code: 
 <pre>
-const {convert} = require('qnvconv);
+import { convert } from 'questionnaire-version-converter';
 let resultOjb = convert(qnJson, 'STU3', 'R4');
 </pre>
 or,
 <pre>
-const {getConverter} = require('qnvconv);
+import { getConverter } from 'questionnaire-version-converter';
 let converter = getConverter('STU3', 'R4');
 let resultOjb = converter(qnJson);
 </pre>
