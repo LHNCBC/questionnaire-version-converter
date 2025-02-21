@@ -1,12 +1,13 @@
-const assert = require('assert');
-const fs = require('fs');
-const path = require("path");
-const { getConverter } = require('../../src/qnvconv');
-const { newPathFrom } = require("../../src/cli_util");
+import { strict as assert } from 'assert';
+import * as fs from 'fs';
+import * as path from "path";
+import { getConverter } from '../../src/qnvconv.js';
+import { newPathFrom } from "../../src/cli_util.js";
 
 // A map of the supported FHIR versions (mapped to itself)
 const FHIR_V = ['STU3', 'R4', 'R5'].reduce((acc, v) => {acc[v] = v; return acc;}, {});
 
+const __dirname= import.meta.dirname;
 const testFiles = {
   STU3: path.resolve(__dirname, '../data/qn-ver-conv-test-stu3base.json'),
   R4: path.resolve(__dirname, '../data/qn-ver-conv-test-r4base.json'),

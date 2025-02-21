@@ -5,13 +5,13 @@
 // See the commander description below on the usage details.
 
 
-const fs = require('fs');
-const path = require('path');
-const {program: commander} = require("commander");
+import * as fs from 'fs';
+import * as path from'path';
+import { program as commander} from "commander";
 
-const { getConverter } = require('./qnvconv');
-const {updateRetStatus, createMsg} = require('./qnvconv_common');
-const { newPathFrom } = require('./cli_util');
+import { getConverter } from './qnvconv.js';
+import { updateRetStatus, createMsg } from './qnvconv_common.js';
+import { newPathFrom } from'./cli_util.js';
 
 commander.showHelpAfterError(); // instruct commander to show full help message on invalid command line arguments.
 commander

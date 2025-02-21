@@ -1,9 +1,9 @@
 
 // Util functions for use in the command line tool or in the mocha tests.
 
-const path = require("path");
+import * as path from "path";
 
-module.exports = {
+export {
   newPathFrom
 }
 

@@ -2,9 +2,9 @@
 
 // Functions for FHIR Questionnaire conversion between STU3 and R4
 
-const {createMsg, updateRetStatus} = require('./qnvconv_common');
+import {createMsg, updateRetStatus} from './qnvconv_common.js';
 
-module.exports = {
+export {
   qnR3ToR4,
   qnR4ToR3
 }

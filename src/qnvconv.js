@@ -15,9 +15,9 @@
 // - updated: add a new tag indicating the conversion
 // - updated: remove all existing profile and add the profile for the target version;
 
-const {qnR3ToR4, qnR4ToR3} = require('./qnvconv_stu3_r4');
-const {qnR4ToR5, qnR5ToR4} = require('./qnvconv_r4_r5');
-const {updateRetStatus} = require('./qnvconv_common');
+import {qnR3ToR4, qnR4ToR3} from './qnvconv_stu3_r4.js';
+import {qnR4ToR5, qnR5ToR4} from './qnvconv_r4_r5.js';
+import {updateRetStatus} from './qnvconv_common.js';
 
 // FHIR version conversion function table - note that STU3 is R3 in this table.
 const qnVerConverters = {
@@ -29,7 +29,7 @@ const qnVerConverters = {
 const supportedVersions = [... new Set(Object.keys(qnVerConverters).map(k => k.substring(0, 2)))]
   .sort().map(v => v==='R3'? 'STU3': v);
 
-module.exports = {
+export {
   getConverter,
   convert
 };
@@ -58,7 +58,7 @@ function getConverter(vFrom, vTo) {
   // Version number chain between (and including) the two given versions
   let vnChain = Array(Math.abs(vnTo-vnFrom)+1).fill(0).map((_, i) => vnFrom + (vnFrom < vnTo? i: -i));
   let converters = [];
-  for(i=1; i < vnChain.length; ++i) {
+  for(let i=1; i < vnChain.length; ++i) {
     let converter = qnVerConverters[converterKey(vnChain[i-1], vnChain[i])];
     if(! converter) return null;
     converters.push(converter);

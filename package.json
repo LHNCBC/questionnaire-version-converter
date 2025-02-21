@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "For converting FHIR questionnaires between FHIR versions.",
   "main": "src/qnvconv.js",
+  "type": "module",
   "scripts": {
     "test": "mocha test/mocha"
   },

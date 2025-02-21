@@ -1,10 +1,9 @@
 
 // Common functions used by the converters.
 
-module.exports = {
+export {
   createMsg,
-  updateRetStatus,
-  newPathFrom
+  updateRetStatus
 }
 
 

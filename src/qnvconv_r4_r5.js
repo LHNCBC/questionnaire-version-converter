@@ -1,9 +1,9 @@
 
 // Functions for FHIR Questionnaire conversion between R4 and R5
 
-const {createMsg, updateRetStatus} = require('./qnvconv_common');
+import {createMsg, updateRetStatus} from './qnvconv_common.js';
 
-module.exports = {
+export {
   qnR4ToR5,
   qnR5ToR4
 }
