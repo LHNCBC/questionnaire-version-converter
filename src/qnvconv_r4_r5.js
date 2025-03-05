@@ -19,9 +19,6 @@ function qnR4ToR5(r4qn) {
     return {status: 0, data: r4qn, message: [createMsg(r4qn, 0, 'Not a Questionnaire resource')]}
   }
   let r5qn = JSON.parse(JSON.stringify(r4qn)); // make a deep copy
-  if(! r5qn.meta) r5qn.meta = {};
-  r5qn.meta.profile = ["http://hl7.org/fhir/5.0/StructureDefinition/Questionnaire"];
-  (r5qn.meta.tag = r5qn.meta.tag || []).push({code: 'lhc-qn-converter-R4toR5'})
 
   let ret = {status: 1, data: r5qn};
   for(let item of r5qn.item || []) {
@@ -67,9 +64,6 @@ function qnR5ToR4(r5qn) {
     return {status: 0, data: r5qn, message: [createMsg(r5qn, 0, 'Not a Questionnaire resource')]}
   }
   let r4qn = JSON.parse(JSON.stringify(r5qn)); // make a deep copy
-  if(! r4qn.meta) r4qn.meta = {};
-  r4qn.meta.profile = ["http://hl7.org/fhir/4.0/StructureDefinition/Questionnaire"];
-  (r4qn.meta.tag = r4qn.meta.tag || []).push({code: 'lhc-qn-converter-R5toR4'})
 
   let ret = {status: 1, data: r4qn};
   for(let item of r4qn.item || []) {
@@ -109,6 +103,16 @@ function qnItemR5ToR4(item) {
           item.answerConstraint + ': non-coding, non-optionsOnly answerOption treated as options-only.'));
       }
     }
+  }
+  else if(item.type === 'coding') {
+    // This may happen only if some list is specified by some extension(s). For now, we are converting
+    // such items to type choice or open-choice based on the value (or absence) of the answerConstraint.
+    item.type = (item.answerConstraint && item.answerConstraint !== 'optionsOnly')? 'open-choice': 'choice';
+    updateRetStatus(ret, 0, createMsg(item, 0, 'Item of type coding converted to ' + item.type));
+  }
+  else if(item.answerConstraint) { // no equivalence in R4
+    updateRetStatus(ret, -1, createMsg(item, -1,
+      'Unable to handle answerConstraint without answerOption/answerValueSet for type ' + item.type));
   }
 
   delete item.answerConstraint;

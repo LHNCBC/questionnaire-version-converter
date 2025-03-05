@@ -21,10 +21,6 @@ function qnR3ToR4(r3qn) {
   }
   let r4qn = JSON.parse(JSON.stringify(r3qn)); // make a deep copy
 
-  if(! r4qn.meta) r4qn.meta = {};
-  r4qn.meta.profile = ["http://hl7.org/fhir/4.0/StructureDefinition/Questionnaire"];
-  (r4qn.meta.tag = r4qn.meta.tag || []).push({code: 'lhc-qn-converter-STU3toR4'})
-
   let ret = {status: 1, data: r4qn};
   for(let item of r4qn.item || []) {
     let subRet = qnItemR3ToR4(item);
@@ -138,10 +134,6 @@ function qnR4ToR3(r4qn) {
     return {status: 0, data: r4qn, message: [createMsg(r4qn, 0, 'Not a Questionnaire resource')]}
   }
   let r3qn = JSON.parse(JSON.stringify(r4qn)); // make a deep copy
-
-  if(! r3qn.meta) r3qn.meta = {};
-  r3qn.meta.profile = ["http://hl7.org/fhir/stu3/StructureDefinition/Questionnaire"];
-  (r3qn.meta.tag = r3qn.meta.tag || []).push({code: 'lhc-qn-converter-R4toSTU3'})
 
   let ret = {status: 1, data: r3qn};
   for(let item of r3qn.item || []) {

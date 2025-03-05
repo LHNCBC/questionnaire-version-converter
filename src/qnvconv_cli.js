@@ -9,7 +9,7 @@ import * as fs from 'fs';
 import * as path from'path';
 import { program as commander} from "commander";
 
-import { getConverter } from './qnvconv.js';
+import { getConverter, supportedVersions } from './qnvconv.js';
 import { updateRetStatus, createMsg } from './qnvconv_common.js';
 import { newPathFrom } from'./cli_util.js';
 
@@ -77,7 +77,7 @@ function processResFile(inPath, outPath, vFrom, vTo, opts) {
   console.log('==== converting', inPath);
   let converter = getConverter(vFrom, vTo);
   if(! converter) {
-    console.error('Unable to obtain converter for conversion from %s to %s', vFrom, vTo);
+    console.error('Unable to convert from %s to %s. Versions currently supported:', vFrom, vTo, supportedVersions);
     return false;
   }
 

@@ -5,14 +5,22 @@ import { getConverter } from '../../src/qnvconv.js';
 import { newPathFrom } from "../../src/cli_util.js";
 
 // A map of the supported FHIR versions (mapped to itself)
-const FHIR_V = ['STU3', 'R4', 'R5'].reduce((acc, v) => {acc[v] = v; return acc;}, {});
+const FHIR_V = ['STU3', 'R4', 'R4B', 'R5'].reduce((acc, v) => {acc[v] = v; return acc;}, {});
 
 const __dirname= import.meta.dirname;
 const testFiles = {
   STU3: path.resolve(__dirname, '../data/qn-ver-conv-test-stu3base.json'),
   R4: path.resolve(__dirname, '../data/qn-ver-conv-test-r4base.json'),
+  R4B: path.resolve(__dirname, '../data/qn-ver-conv-test-r4bbase.json'),
   R5: path.resolve(__dirname, '../data/qn-ver-conv-test-r5base.json'),
   output: path.resolve(__dirname, '../data/output')
+}
+
+let PROFILE = {
+  STU3: 'http://hl7.org/fhir/3.0/StructureDefinition/Questionnaire',
+  R4: 'http://hl7.org/fhir/4.0/StructureDefinition/Questionnaire',
+  R4B: 'http://hl7.org/fhir/4.3/StructureDefinition/Questionnaire',
+  R5: 'http://hl7.org/fhir/5.0/StructureDefinition/Questionnaire'
 }
 
 fs.mkdirSync(testFiles.output, {recursive: true});
@@ -23,7 +31,7 @@ fs.mkdirSync(testFiles.output, {recursive: true});
  * @param vTo to FHIR version
  * @param callback a callback function that takes 2 parameters:
  *        - converted: boolean, true if converted, false if aborted due to unexpected errors.
- *        - qnFrom: the questionnaire before the onversion
+ *        - qnFrom: the questionnaire before the conversion
  *        - qnTo: the questionnaire after the conversion.
  */
 function testQnVerConv(vFrom, vTo, callback) {
@@ -35,7 +43,6 @@ function testQnVerConv(vFrom, vTo, callback) {
     callback(false);
     return;
   }
-
   let convRet = converter(inRes);
 
   // write the converted questionnaire and messages to file for possible manual inspection
@@ -50,7 +57,8 @@ describe('FHIR Questionnaire version conversion', function() {
   it('should work from STU3 to R4', function(done) {
     testQnVerConv(FHIR_V.STU3, FHIR_V.R4, (converted, qnFrom, qnTo) => {
       assert(!!converted);
-      assert(qnTo.meta?.tag?.find(t => t.code === 'lhc-qn-converter-STU3toR4')); // the conversion is tagged
+      assert.equal(qnTo.meta.profile[0], PROFILE.R4);
+      assert(qnTo.meta?.tag?.find(t => t.code === 'lhc-qnvconv-STU3-to-R4')); // the conversion is tagged
 
       let x002 = qnTo.item.find(t => t.linkId === '/X-002');
       assert(x002);
@@ -74,7 +82,7 @@ describe('FHIR Questionnaire version conversion', function() {
   it('should work from R4 to STU3', function(done) {
     testQnVerConv(FHIR_V.R4, FHIR_V.STU3, (converted, qnFrom, qnTo) => {
       assert(!!converted);
-      assert(qnTo.meta?.tag?.find(t => t.code === 'lhc-qn-converter-R4toSTU3')); // the conversion is tagged
+      assert(qnTo.meta?.tag?.find(t => t.code === 'lhc-qnvconv-R4-to-STU3')); // the conversion is tagged
       assert(!qnTo.derivedFrom);
 
       let x002 = qnTo.item.find(t => t.linkId === '/X-002');
@@ -104,7 +112,7 @@ describe('FHIR Questionnaire version conversion', function() {
   it('should work from R4 to R5', function(done) {
     testQnVerConv(FHIR_V.R4, FHIR_V.R5, (converted, qnFrom, qnTo) => {
       assert(!!converted);
-      assert(qnTo.meta?.tag?.find(t => t.code === 'lhc-qn-converter-R4toR5')); // the conversion is tagged
+      assert(qnTo.meta?.tag?.find(t => t.code === 'lhc-qnvconv-R4-to-R5')); // the conversion is tagged
 
       let x003 = qnTo.item.find(t => t.linkId === '/X-003');
       assert(x003);
@@ -125,7 +133,7 @@ describe('FHIR Questionnaire version conversion', function() {
   it('should work from R5 to R4', function(done) {
     testQnVerConv(FHIR_V.R5, FHIR_V.R4, (converted, qnFrom, qnTo) => {
       assert(!!converted);
-      assert(qnTo.meta?.tag?.find(t => t.code === 'lhc-qn-converter-R5toR4')); // the conversion is tagged
+      assert(qnTo.meta?.tag?.find(t => t.code === 'lhc-qnvconv-R5-to-R4')); // the conversion is tagged
 
       let x003 = qnTo.item.find(t => t.linkId === '/X-003');
       assert(x003);
@@ -140,17 +148,38 @@ describe('FHIR Questionnaire version conversion', function() {
   });
 
   // This is just to test that the chained-conversion works
-  it('should work from R3 to R5', function(done) {
+  it('should work from STU3 to R5', function(done) {
     testQnVerConv(FHIR_V.STU3, FHIR_V.R5, (converted, qnFrom, qnTo) => {
       assert(!!converted);
-      assert(qnTo.meta?.tag?.find(t => t.code === 'lhc-qn-converter-R4toR5')); // the conversion is tagged
-      assert(qnTo.meta?.tag?.find(t => t.code === 'lhc-qn-converter-STU3toR4')); // the conversion is tagged
+      assert(qnTo.meta?.tag?.find(t => t.code === 'lhc-qnvconv-STU3-to-R5')); // the conversion is tagged
 
       let x010 = qnTo.item.find(t => t.linkId === '/X-010');
       assert(x010);
       assert(x010.answerConstraint, 'optionsOrString');
       assert(x010.type, 'coding');
 
+      done();
+    });
+  });
+
+  // The questionnaires are the same before and after, and the conversion path has been tested
+  // in the STU3 to R5 conversion above. Only need to test the changes in meta.
+  it('should work from R4 to R4B', function(done) {
+    testQnVerConv(FHIR_V.R4, FHIR_V.R4B, (converted, qnFrom, qnTo) => {
+      assert(!!converted);
+      assert.equal(qnTo.meta.profile[0], PROFILE.R4B);
+      assert(qnTo.meta?.tag?.find(t => t.code === 'lhc-qnvconv-R4-to-R4B')); // the conversion is tagged
+      done();
+    });
+  });
+
+  // The questionnaires are the same before and after, and the conversion path has been tested
+  // in the STU3 to R5 conversion above. Only need to test the changes in meta.
+  it('should work from R4B to R4', function(done) {
+    testQnVerConv(FHIR_V.R4B, FHIR_V.R4, (converted, qnFrom, qnTo) => {
+      assert(!!converted);
+      assert.equal(qnTo.meta.profile[0], PROFILE.R4);
+      assert(qnTo.meta?.tag?.find(t => t.code === 'lhc-qnvconv-R4B-to-R4')); // the conversion is tagged
       done();
     });
   });
