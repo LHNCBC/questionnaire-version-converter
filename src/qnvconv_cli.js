@@ -18,7 +18,7 @@ commander
   .option('-v, --verbosity <number>', 'message display level: 0 - very brief; 1 - brief; 2 - detailed.',
     (x)=>parseInt(x), 1) // there seems to be a bug, using parseInt alone doesn't work when option value equals default.
   .option('-p, --pretty', 'whether to enable pretty print when writing results to file', false)
-  .argument('<version-from>', 'the FHIR version for the input questionnaries')
+  .argument('<version-from>', 'the FHIR version for the input questionnaires')
   .argument('<version-to>', 'the target version for the converted questionnaires')
   .argument('<input-path>', 'the path for the input file or directory - only .json files will be processed.')
   .argument('<output-dir>', 'output directory (must exist).')

@@ -70,9 +70,12 @@ function qnR5ToR4(r5qn) {
     let subRet = qnItemR5ToR4(item);
     updateRetStatus(ret, subRet.status, subRet.message);
   }
-  if(r4qn.copyrightLabel) {
-    delete r4qn.copyrightLabel;
-    updateRetStatus(ret, -1, createMsg(r4qn, -1, 'deleted copyrightLabel'));
+
+  for(let ele in ['versionAlgorithmCoding', 'versionAlgorithmString', 'copyrightLabel']) {
+    if(r4qn[ele]) {
+      delete r4qn[ele];
+      updateRetStatus(ret, -1, createMsg(r4qn, -1, 'Dropped ' + ele));
+    }
   }
 
   return ret;
@@ -116,11 +119,9 @@ function qnItemR5ToR4(item) {
   }
 
   delete item.answerConstraint;
-  for(let alg in ['versionAlgorithmCoding', 'versionAlgorithmString', 'disabledDisplay']) {
-    if(item[alg]) {
-      delete item[alg];
-      updateRetStatus(ret, -1, createMsg(item, -1, 'Dropped ' + alg));
-    }
+  if(item.disabledDisplay) {
+    delete item.disabledDisplay;
+    updateRetStatus(ret, -1, createMsg(item, -1, 'Dropped disabledDisplay'));
   }
 
   for(let subItem of item.item || []) {
