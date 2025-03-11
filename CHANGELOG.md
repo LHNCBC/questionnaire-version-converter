@@ -1,0 +1,8 @@
+# Change Log
+
+This log documents the significant changes for each release.
+This project follows [Semantic Versioning](http://semver.org/).
+
+## [1.0.0] - 2025-02-10
+### New
+- First version with a library and a command line interface

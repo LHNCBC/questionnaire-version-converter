@@ -1,0 +1,6 @@
+tmp/
+.tmp
+.idea
+node_modules
+**/*.swp
+test/data/output

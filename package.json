@@ -1,0 +1,17 @@
+{
+  "name": "questionnaire-version-converter",
+  "version": "1.0.0",
+  "description": "For converting FHIR questionnaires between FHIR versions.",
+  "main": "src/qnvconv.js",
+  "type": "module",
+  "scripts": {
+    "test": "mocha test/mocha"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "commander": "^13.1.0",
+    "mocha": "^11.1.0",
+    "typescript": "^5.8.2"
+  }
+}
