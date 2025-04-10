@@ -1,6 +1,6 @@
 {
   "name": "questionnaire-version-converter",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "For converting FHIR questionnaires between FHIR versions.",
   "keywords": [
     "fhir",
@@ -9,6 +9,11 @@
   ],
   "main": "src/qnvconv.js",
   "type": "module",
+  "homepage": "https://github.com/LHNCBC/questionnaire-version-converter",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/LHNCBC/questionnaire-version-converter"
+  },
   "license": "See LICENSE.md",
   "scripts": {
     "test": "mocha test/mocha"
