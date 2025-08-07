@@ -4,7 +4,11 @@
 export {
   createMsg,
   updateRetStatus,
-  findChoiceX
+  findChoiceX,
+  findIntVerExts,
+  toIntVerExtUrl,
+  removeInterVerExts,
+  addExtension
 }
 
 
@@ -80,4 +84,58 @@ function updateRetStatus(ret, status, message) {
   }
 
   return ret;
+}
+
+
+/**
+ * Find the inter-version extensions on the given element for the given fields.
+ * @param ele a data element (field) of a FHIR resource, on which to find inter-version extensions
+ * @param fhirVer the FHIR version
+ * @param extPathPrefix inter-version extension url without the field name.
+ * @param fields the fields to check if they had been preserved as inter-version extensions
+ * @return the list of inter-version extensions or empty list if none.
+ */
+function findIntVerExts(ele, fhirVer, extPathPrefix, ...fields) {
+  if(! ele.extension?.length || !fields?.length) {
+    return [];
+  }
+  let extUrlSet = new Set(fields.map(f => toIntVerExtUrl(fhirVer, extPathPrefix + '.' + f)));
+
+  return ele.extension.filter(ext => extUrlSet.has(ext.url));
+}
+
+
+/**
+ * Create FHIR inter-version extension URL for the given FHIR version and extension path as
+ * described in https://build.fhir.org/versions.html#extensions.
+ * @param fhirVer FHIR version
+ * @param ivePath the inter-version extension url path
+ * @return the inter-version extension URL
+ */
+function toIntVerExtUrl(fhirVer, ivePath) {
+  return `http://hl7.org/fhir/${fhirVer}/StructureDefinition/extension-${ivePath}`;
+}
+
+
+/**
+ * Per spec, check and remove the inter-version extensions on the given element for the given
+ * FHIR version. There is no recursion here, that is, sub-elements, if any, will not be checked.
+ * @param ele the element whose extensions are to be checked.
+ * @param fhirVer the target FHIR version, it's the numeric version#, e.g., 3.0, 4.0, 4.3 (for R4B), 5.0, etc.
+ */
+function removeInterVerExts(ele, fhirVer) {
+  let len = ele?.extension?.length || 0;
+  let intVerExtPrefix = `http://hl7.org/fhir/${fhirVer}/StructureDefinition/extension-`;
+  for(let i = len - 1; i >= 0; --i) {
+    let ext = ele.extension[i];
+    if(ext?.url?.startsWith(intVerExtPrefix)) {
+      ele.extension.splice(i, 1);
+    }
+  }
+}
+
+
+function addExtension(ele, ive) {
+  ele.extension = ele.extension || [];
+  ele.extension.push(ive);
 }

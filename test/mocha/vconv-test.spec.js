@@ -3,16 +3,19 @@ import * as fs from 'fs';
 import * as path from "path";
 import { getConverter } from '../../src/qnvconv.js';
 import { newPathFrom } from "../../src/cli_util.js";
+import {toIntVerExtUrl} from "../../src/qnvconv_common.js";
 
 // A map of the supported FHIR versions (mapped to itself)
 const FHIR_V = ['STU3', 'R4', 'R4B', 'R5'].reduce((acc, v) => {acc[v] = v; return acc;}, {});
-
+const iveUrl = (fhirVer, urlPath) => `http://hl7.org/fhir/${fhirVer}/StructureDefinition/extension-Questionnaire.item.answerConstraint`
 const __dirname= import.meta.dirname;
 const testFiles = {
   STU3: path.resolve(__dirname, '../data/qn-ver-conv-test-stu3base.json'),
   R4: path.resolve(__dirname, '../data/qn-ver-conv-test-r4base.json'),
   R4B: path.resolve(__dirname, '../data/qn-ver-conv-test-r4bbase.json'),
   R5: path.resolve(__dirname, '../data/qn-ver-conv-test-r5base.json'),
+  R4_IVE: path.resolve(__dirname, '../data/qnvconv-test-r4-with-inter-ver-ext.json'),
+  R5_IVE: path.resolve(__dirname, '../data/qnvconv-test-r5-for-inter-ver-ext.json'),
   output: path.resolve(__dirname, '../data/output')
 }
 
@@ -26,16 +29,18 @@ let PROFILE = {
 fs.mkdirSync(testFiles.output, {recursive: true});
 
 /**
- * Test questionnaire conversion from the vFrom to vto.
+ * Test questionnaire conversion for the given json file from version vFrom to vTo.
+ * @param qnFile the json file for the questionnaire resource to be converted.
  * @param vFrom from FHIR version
  * @param vTo to FHIR version
  * @param callback a callback function that takes 2 parameters:
  *        - converted: boolean, true if converted, false if aborted due to unexpected errors.
  *        - qnFrom: the questionnaire before the conversion
  *        - qnTo: the questionnaire after the conversion.
+ * @param options optional conversion options. See the description about the converter
+ *        function table at the top of qnvconv.js for more details.
  */
-function testQnVerConv(vFrom, vTo, callback) {
-  const qnFile = testFiles[vFrom];
+function testQnVerConvFile(qnFile, vFrom, vTo, callback, options) {
   const inRes = JSON.parse(fs.readFileSync(qnFile));
   const converter = getConverter(vFrom, vTo);
   if(! converter) {
@@ -43,13 +48,26 @@ function testQnVerConv(vFrom, vTo, callback) {
     callback(false);
     return;
   }
-  let convRet = converter(inRes);
+  let convRet = converter(inRes, options);
 
   // write the converted questionnaire and messages to file for possible manual inspection
   fs.writeFileSync(newPathFrom(qnFile, testFiles.output, '-' + vTo, '.json'), JSON.stringify(convRet.data, null, 4));
   fs.writeFileSync(newPathFrom(qnFile, testFiles.output, '-msg-' + vTo, '.json'), JSON.stringify(convRet.message||[], null, 4));
 
   callback(convRet.status > -2, inRes, convRet.data);
+}
+
+
+/**
+ * Test questionnaire conversion from vFrom to vto.
+ * @param vFrom the source FHIR version
+ * @param vTo the target/to FHIRversion
+ * @param callback the function to be called when done. See testQnVerConvFile() for more details.
+ * @param options optional conversion options. See testQnVerConvFile() for more details.
+ */
+function testQnVerConv(vFrom, vTo, callback, options) {
+  const qnFile = testFiles[vFrom];
+  testQnVerConvFile(qnFile, vFrom, vTo, callback, options);
 }
 
 
@@ -79,7 +97,7 @@ describe('FHIR Questionnaire version conversion', function() {
   });
 
 
-  it('should work from R4 to STU3', function(done) {
+  it('should work from R4 to STU3 (tag conv history by default)', function(done) {
     testQnVerConv(FHIR_V.R4, FHIR_V.STU3, (converted, qnFrom, qnTo) => {
       assert(!!converted);
       assert(qnTo.meta?.tag?.find(t => t.code === 'lhc-qnvconv-R4-to-STU3')); // the conversion is tagged
@@ -109,10 +127,10 @@ describe('FHIR Questionnaire version conversion', function() {
     });
   });
 
-  it('should work from R4 to R5', function(done) {
+  it('should work from R4 to R5 (with conv history tagging disabled)', function(done) {
     testQnVerConv(FHIR_V.R4, FHIR_V.R5, (converted, qnFrom, qnTo) => {
       assert(!!converted);
-      assert(qnTo.meta?.tag?.find(t => t.code === 'lhc-qnvconv-R4-to-R5')); // the conversion is tagged
+      assert(! qnTo.meta?.tag?.find(t => t.code === 'lhc-qnvconv-R4-to-R5')); // the conversion is tagged
 
       let x003 = qnTo.item.find(t => t.linkId === '/X-003');
       assert(x003);
@@ -127,7 +145,7 @@ describe('FHIR Questionnaire version conversion', function() {
       assert(x011);
 
       done();
-    });
+    }, {tag_conv: false});
   });
 
   it('should work from R5 to R4', function(done) {
@@ -180,6 +198,44 @@ describe('FHIR Questionnaire version conversion', function() {
       assert(!!converted);
       assert.equal(qnTo.meta.profile[0], PROFILE.R4);
       assert(qnTo.meta?.tag?.find(t => t.code === 'lhc-qnvconv-R4B-to-R4')); // the conversion is tagged
+      done();
+    });
+  });
+});
+
+describe('FHIR Questionnaire version conversion', function() {
+  it('should include inter-version extension when appropriate (R5 to R4)', function(done) {
+    testQnVerConvFile(testFiles["R5_IVE"], FHIR_V.R5, FHIR_V.R4, (converted, qnFrom, qnTo) => {
+      assert(!!converted);
+      let verAlgIVE = (qnTo.extension || []).some(ext => ext.url === toIntVerExtUrl('5.0', 'Questionnaire.versionAlgorithm'));
+      assert(verAlgIVE);
+
+      let x001 = qnTo.item.find(t => t.linkId === '/X-001');
+      assert(x001);
+      let acIVE = (x001.extension || []).some(ext => ext.url === toIntVerExtUrl('5.0', 'Questionnaire.item.answerConstraint'));
+      assert(! acIVE); // perfect conversion, no need to preserve anything with inter-version extension.
+
+      let x002 = qnTo.item.find(t => t.linkId === '/X-002');
+      assert(x002);
+      acIVE = (x002.extension || []).some(ext => ext.url === toIntVerExtUrl('5.0', 'Questionnaire.item.answerConstraint'));
+      assert(acIVE);
+
+      done();
+    }, {interVerExt: true});
+  });
+
+  it('should recover inter-version extension when appropriate (R4 to R5)', function(done) {
+    testQnVerConvFile(testFiles["R4_IVE"], FHIR_V.R4, FHIR_V.R5, (converted, qnFrom, qnTo) => {
+      assert(!!converted);
+      assert.equal(qnTo.versionAlgorithmCoding?.code, 'semver');
+      assert(! qnTo.extension?.some(ext => ext.url?.startsWith(toIntVerExtUrl('5.0', 'Questionnaire'))));
+
+      let x001 = qnTo.item.find(t => t.linkId === '/X-001');
+      assert(x001);
+      let acIVE = (x001.extension || []).some(ext => ext.url === toIntVerExtUrl('5.0', 'Questionnaire.item.answerConstraint'));
+      assert(! acIVE);
+      assert.equal(x001.answerConstraint, 'optionsOrType');
+
       done();
     });
   });
