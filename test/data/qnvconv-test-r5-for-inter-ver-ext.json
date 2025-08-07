@@ -1,0 +1,65 @@
+{
+    "id": "qnvconv-test-r5-for-inter-ver-ext",
+    "meta": {
+        "profile": [
+            "http://hl7.org/fhir/5.0/StructureDefinition/Questionnaire"
+        ],
+        "tag": [
+            {
+                "code": "born-r5-ive"
+            }
+        ]
+    },
+    "url": "http:/lforms-fhir.nlm.nih.gov/baseR5/Questionnaire/qnvconv-test-r5-for-inter-ver-ext",
+    "status": "draft",
+    "title": "Demo form",
+    "resourceType": "Questionnaire",
+    "versionAlgorithmCoding": {
+        "system": "http://hl7.org/fhir/version-algorithm",
+        "code":"semver"
+    },
+    "item": [
+        {
+            "type": "coding",
+            "linkId": "/X-001",
+            "text": "Favorite color",
+            "answerOption": [
+                {
+                    "valueCoding": {
+                        "code": "c",
+                        "display": "Green"
+                    },
+                    "initialSelected": true
+                },
+                {
+                    "valueCoding": {
+                        "code": "o",
+                        "display": "Other"
+                    }
+                }
+            ],
+            "answerConstraint": "optionsOrString"
+        },
+        {
+            "type": "coding",
+            "linkId": "/X-002",
+            "text": "Favorite color",
+            "answerOption": [
+                {
+                    "valueCoding": {
+                        "code": "c",
+                        "display": "Green"
+                    },
+                    "initialSelected": true
+                },
+                {
+                    "valueCoding": {
+                        "code": "o",
+                        "display": "Other"
+                    }
+                }
+            ],
+            "answerConstraint": "optionsOrType"
+        }
+    ]
+}

@@ -1,0 +1,54 @@
+{
+    "id": "qnvconv-test-r4-with-inter-ver-ext",
+    "meta": {
+        "profile": [
+            "http://hl7.org/fhir/4.0/StructureDefinition/Questionnaire"
+        ],
+        "tag": [
+            {
+                "code": "r4-with-r5-ive"
+            }
+        ]
+    },
+    "url": "http:/lforms-fhir.nlm.nih.gov/baseR4/Questionnaire/qnvconv-test-r4-with-inter-ver-ext",
+    "status": "draft",
+    "title": "Demo form",
+    "resourceType": "Questionnaire",
+    "extension": [
+        {
+            "url": "http://hl7.org/fhir/5.0/StructureDefinition/extension-Questionnaire.versionAlgorithm",
+            "valueCoding": {
+                "system": "http://hl7.org/fhir/version-algorithm",
+                "code":"semver"
+            }
+        }
+    ],
+    "item": [
+        {
+            "type": "coding",
+            "linkId": "/X-001",
+            "text": "Favorite color",
+            "answerOption": [
+                {
+                    "valueCoding": {
+                        "code": "c",
+                        "display": "Green"
+                    },
+                    "initialSelected": true
+                },
+                {
+                    "valueCoding": {
+                        "code": "o",
+                        "display": "Other"
+                    }
+                }
+            ],
+            "extension": [
+                {
+                    "url": "http://hl7.org/fhir/5.0/StructureDefinition/extension-Questionnaire.item.answerConstraint",
+                    "valueCode": "optionsOrType"
+                }
+            ]
+        }
+    ]
+}
