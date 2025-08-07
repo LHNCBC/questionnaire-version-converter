@@ -31,10 +31,12 @@ import {updateRetStatus} from './qnvconv_common.js';
 // Where:
 // @param questionnaire: required, the questionnaire resource to be converted
 // @param options: optional, an object with 0 or more of the following fields:
-//   - tag_conv: boolean (default true), whether to add a tag to record this conversion
+//   - tag_conv: boolean (default true), whether to add a meta tag to record this conversion
 //   - interVerExt: boolean (default false), whether to add the inter-version extensions
-//     when appropriate. Note that this option is advisory, the specific converters may
-//     decide based on the circumstances whether to include a specific extension.
+//     during down-conversion, or whether to recover data from such extensions during
+//     up-conversion.
+//     Note that this is an experimental feature, it's only implemented for conversions
+//     between R4 and R5, and is disabled by default.
 //     For more details on inter-version extensions, please refer to:
 //         https://build.fhir.org/versions.html#extensions
 // @return an object with the fields status, data, and message, where data is the resulting
