@@ -16,10 +16,6 @@
 // - updated: add a new tag that indicates the conversion
 // - updated: remove all existing profiles and add the profile for the target version;
 
-// TODO inter-version extensions: need to remove (perhaps after check & use) all such extensions
-//      that have the target FHIR version, per spec: https://build.fhir.org/versions.html#extensions
-//      "It is always an error to use a cross version extension in the same version..."
-//      - such extensions may or may not have been added by this tool
 import {qnR3ToR4, qnR4ToR3} from './qnvconv_stu3_r4.js';
 import {qnR4ToR5, qnR5ToR4} from './qnvconv_r4_r5.js';
 import {updateRetStatus} from './qnvconv_common.js';
