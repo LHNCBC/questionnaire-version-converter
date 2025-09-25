@@ -100,7 +100,7 @@ describe('FHIR Questionnaire version conversion', function() {
   it('should work from R4 to STU3 (tag conv history by default)', function(done) {
     testQnVerConv(FHIR_V.R4, FHIR_V.STU3, (converted, qnFrom, qnTo) => {
       assert(!!converted);
-      assert(qnTo.meta?.tag?.find(t => t.code === 'lhc-qnvconv-R4-to-STU3')); // the conversion is tagged
+      assert(qnTo.meta.tag.find(t => t.code === 'lhc-qnvconv-R4-to-STU3')); // the conversion is tagged
       assert(!qnTo.derivedFrom);
 
       let x002 = qnTo.item.find(t => t.linkId === '/X-002');
@@ -207,17 +207,17 @@ describe('FHIR Questionnaire version conversion', function() {
   it('should include inter-version extension when appropriate (R5 to R4)', function(done) {
     testQnVerConvFile(testFiles["R5_IVE"], FHIR_V.R5, FHIR_V.R4, (converted, qnFrom, qnTo) => {
       assert(!!converted);
-      let verAlgIVE = (qnTo.extension || []).some(ext => ext.url === toIntVerExtUrl('5.0', 'Questionnaire.versionAlgorithm'));
+      let verAlgIVE = qnTo.extension.some(ext => ext.url === toIntVerExtUrl('5.0', 'Questionnaire.versionAlgorithm'));
       assert(verAlgIVE);
 
       let x001 = qnTo.item.find(t => t.linkId === '/X-001');
       assert(x001);
-      let acIVE = (x001.extension || []).some(ext => ext.url === toIntVerExtUrl('5.0', 'Questionnaire.item.answerConstraint'));
+      let acIVE = x001.extension?.some(ext => ext.url === toIntVerExtUrl('5.0', 'Questionnaire.item.answerConstraint'));
       assert(! acIVE); // perfect conversion, no need to preserve anything with inter-version extension.
 
       let x002 = qnTo.item.find(t => t.linkId === '/X-002');
       assert(x002);
-      acIVE = (x002.extension || []).some(ext => ext.url === toIntVerExtUrl('5.0', 'Questionnaire.item.answerConstraint'));
+      acIVE = x002.extension.some(ext => ext.url === toIntVerExtUrl('5.0', 'Questionnaire.item.answerConstraint'));
       assert(acIVE);
 
       done();
@@ -227,12 +227,12 @@ describe('FHIR Questionnaire version conversion', function() {
   it('should recover inter-version extension when appropriate (R4 to R5)', function(done) {
     testQnVerConvFile(testFiles["R4_IVE"], FHIR_V.R4, FHIR_V.R5, (converted, qnFrom, qnTo) => {
       assert(!!converted);
-      assert.equal(qnTo.versionAlgorithmCoding?.code, 'semver');
+      assert.equal(qnTo.versionAlgorithmCoding.code, 'semver');
       assert(! qnTo.extension?.some(ext => ext.url?.startsWith(toIntVerExtUrl('5.0', 'Questionnaire'))));
 
       let x001 = qnTo.item.find(t => t.linkId === '/X-001');
       assert(x001);
-      let acIVE = (x001.extension || []).some(ext => ext.url === toIntVerExtUrl('5.0', 'Questionnaire.item.answerConstraint'));
+      let acIVE = x001.extension?.some(ext => ext.url === toIntVerExtUrl('5.0', 'Questionnaire.item.answerConstraint'));
       assert(! acIVE);
       assert.equal(x001.answerConstraint, 'optionsOrType');
 

@@ -135,6 +135,11 @@ function removeInterVerExts(ele, fhirVer) {
 }
 
 
+/**
+ * Add the given inter-version extension to the given element.
+ * @param ele the element to which the extension is to be added.
+ * @param ive the inter-version extension to be added.
+ */
 function addExtension(ele, ive) {
   ele.extension = ele.extension || [];
   ele.extension.push(ive);
