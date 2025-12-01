@@ -3,6 +3,11 @@
 This log documents the significant changes for each release.
 This project follows [Semantic Versioning](http://semver.org/).
 
+## [1.1.0] - 2025-08-07
+### Changed
+- Added options to enable (default) or disable conversion history tagging.
+- Added inter-version extension (and recovery) between R4 and R5
+
 ## [1.0.2] - 2025-04-10
 ### Changed
 - Added homepage and repository to the package.json
